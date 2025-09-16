@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
@@ -64,3 +66,56 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+.email-container {
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+@layer components {
+    .email-header {
+        @apply bg-red-500 text-white px-6 py-8 text-center;
+    }
+
+    .email-content {
+        @apply px-6 py-8 bg-white;
+    }
+
+    .email-footer {
+        @apply bg-gray-100 px-6 py-4 text-center text-sm text-gray-600;
+    }
+
+    .details-card {
+        @apply bg-gray-50 rounded-lg p-6 border border-gray-200 mb-6;
+    }
+
+    .important-note {
+        @apply bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6;
+    }
+
+    /* Couleurs personnalisées */
+    .bg-danger {
+        @apply bg-red-500;
+    }
+
+    .text-danger {
+        @apply text-red-500;
+    }
+
+    .bg-warning {
+        @apply bg-yellow-100;
+    }
+
+    .border-warning {
+        @apply border-yellow-300;
+    }
+
+    .bg-primary {
+        @apply bg-blue-500;
+    }
+
+    .bg-success {
+        @apply bg-green-500;
+    }
+}

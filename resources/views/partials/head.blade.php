@@ -11,4 +11,25 @@
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+<style>
+    .bg-danger-500 {
+        background-color: #ef4444;
+    }
+
+    .bg-danger-100 {
+        background-color: #fee2e2;
+    }
+
+    .text-danger-100 {
+        color: #fee2e2;
+    }
+
+    .bg-warning-50 {
+        background-color: #fffbeb;
+    }
+
+    .border-warning-200 {
+        border-color: #fed7aa;
+    }
+</style>
 @fluxAppearance

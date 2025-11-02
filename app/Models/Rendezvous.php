@@ -30,11 +30,19 @@ class Rendezvous extends Model
         'est_paye',
     ];
 
-    protected $casts = [
-        'date_heure' => 'datetime',
-        'prix_consultation' => 'decimal:2',
-        'est_paye' => 'boolean',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'date_heure' => 'datetime',
+            'prix_consultation' => 'decimal:2',
+            'est_paye' => 'boolean',
+        ];
+    }
 
     const STATUTS = [
         'planifie' => 'Planifié',

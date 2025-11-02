@@ -4,22 +4,22 @@
 ])
 
 @php
-$classes = Flux::classes('[grid-area:header]')
-    ->add('z-10 min-h-14')
-    ->add($container ? '' : 'flex items-center px-6 lg:px-8')
-    ;
+    $classes = Flux::classes('[grid-area:header]')
+        ->add('z-10 min-h-16')
+        ->add($container ? '' : 'flex items-center px-3 lg:px-6');
 
-if ($sticky) {
-    $attributes = $attributes->merge([
-        'x-data' => '',
-        'x-bind:style' => '{ position: \'sticky\', top: $el.offsetTop + \'px\', \'max-height\': \'calc(100vh - \' + $el.offsetTop + \'px)\' }',
-    ]);
-}
+    if ($sticky) {
+        $attributes = $attributes->merge([
+            'x-data' => '',
+            'x-bind:style' =>
+                '{ position: \'sticky\', top: $el.offsetTop + \'px\', \'max-height\': \'calc(100vh - \' + $el.offsetTop + \'px)\' }',
+        ]);
+    }
 @endphp
 
 <header {{ $attributes->class($classes) }} data-flux-header>
     @if ($container)
-        <div class="mx-auto w-full h-full [:where(&)]:max-w-7xl px-6 lg:px-8 flex items-center">
+        <div class="mx-auto w-full h-full [:where(&)]:max-w-7xl px-4 lg:px-6 flex items-center">
             {{ $slot }}
         </div>
     @else

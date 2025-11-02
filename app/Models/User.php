@@ -18,6 +18,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar, HasEmailAuthentication, HasAppAuthentication, HasAppAuthenticationRecovery, MustVerifyEmail
 {
@@ -25,6 +26,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
     use HasFactory,
         Notifiable,
         HasRoles,
+        SoftDeletes,
         InteractsWithMedia;
 
 
@@ -53,6 +55,15 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
         'remember_token',
         'app_authentication_secret',
         'app_authentication_recovery_codes',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'avatar_url',
     ];
 
     /**
@@ -94,42 +105,42 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->getFirstMediaUrl('avatars', 'thumb') ?: $this->avatar_url;
+        return $this->getFirstMediaUrl('avatars', 'thumb') ?: $this->avatar;
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('avatars', 'thumb') ?: $this->avatar;
     }
 
     /**
      * Get the user's initials
      */
-    public function initials(): string
+    public function initials(): ?string
     {
-        return Str::of($this->name)
+        return $this->name
+            ? Str::of($this->name)
             ->explode(' ')
             ->take(2)
             ->map(fn($word) => Str::substr($word, 0, 1))
-            ->implode('');
+            ->implode('')
+            : null;
     }
+
 
     public function getAppAuthenticationSecret(): ?string
     {
-        // This method should return the user's saved app authentication secret.
-
         return $this->app_authentication_secret;
     }
 
     public function saveAppAuthenticationSecret(?string $secret): void
     {
-        // This method should save the user's app authentication secret.
-
         $this->app_authentication_secret = $secret;
         $this->save();
     }
 
     public function getAppAuthenticationHolderName(): string
     {
-        // In a user's authentication app, each account can be represented by a "holder name".
-        // If the user has multiple accounts in your app, it might be a good idea to use
-        // their email address as then they are still uniquely identifiable.
-
         return $this->email;
     }
 
@@ -138,8 +149,6 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
      */
     public function getAppAuthenticationRecoveryCodes(): ?array
     {
-        // This method should return the user's saved app authentication recovery codes.
-
         return $this->app_authentication_recovery_codes;
     }
 
@@ -148,23 +157,17 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
      */
     public function saveAppAuthenticationRecoveryCodes(?array $codes): void
     {
-        // This method should save the user's app authentication recovery codes.
-
         $this->app_authentication_recovery_codes = $codes;
         $this->save();
     }
 
     public function hasEmailAuthentication(): bool
     {
-        // This method should return true if the user has enabled email authentication.
-
         return $this->has_email_authentication;
     }
 
     public function toggleEmailAuthentication(bool $condition): void
     {
-        // This method should save whether or not the user has enabled email authentication.
-
         $this->has_email_authentication = $condition;
         $this->save();
     }
@@ -214,9 +217,19 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
     protected static function booted()
     {
         static::created(function ($user) {
-            if (!$user->hasAnyRole(['Super Admin', 'medecin', 'personnel', 'secretaire'])) {
+            if (!$user->hasAnyRole(['Super Admin', 'Medecin Chef Service', 'medecin', 'personnel', 'secretaire'])) {
                 $user->assignRole('patient');
             }
         });
+    }
+
+    public function medecin()
+    {
+        return $this->hasOne(Medecin::class, 'user_id');
+    }
+
+    public function patient()
+    {
+        return $this->hasOne(Patient::class, 'user_id');
     }
 }

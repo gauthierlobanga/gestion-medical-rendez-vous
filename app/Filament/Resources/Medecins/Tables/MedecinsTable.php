@@ -3,9 +3,14 @@
 namespace App\Filament\Resources\Medecins\Tables;
 
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Size;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Filters\Filter;
+use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
@@ -24,6 +29,14 @@ class MedecinsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('service.nom')
+                    ->formatStateUsing(fn($state): string => Str::limit($state, 20))
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                        return $state;
+                    })
                     ->label('Service')
                     ->searchable()
                     ->sortable(),
@@ -37,6 +50,11 @@ class MedecinsTable
                     ->label('Tarif')
                     ->money('EUR')
                     ->sortable(),
+                TextColumn::make('est_responsable')
+                    ->label('Responsable')
+                    ->badge()
+                    ->color(fn($record) => $record->est_responsable ? 'success' : 'gray')
+                    ->formatStateUsing(fn($record) => $record->est_responsable ? 'OUI' : 'NON'),
                 IconColumn::make('is_active')
                     ->label('Actif')
                     ->boolean(),
@@ -52,8 +70,15 @@ class MedecinsTable
                     ->query(fn(Builder $query) => $query->where('is_active', true)),
             ])
             ->recordActions([
-                EditAction::make(),
-                ViewAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    ViewAction::make(),
+                ])->label('More')
+                    ->icon(Heroicon::EllipsisVertical)
+                    ->size(Size::Small)
+                    ->color('primary')
+                    ->button(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

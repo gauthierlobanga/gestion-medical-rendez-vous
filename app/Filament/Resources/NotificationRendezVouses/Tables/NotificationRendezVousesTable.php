@@ -2,11 +2,16 @@
 
 namespace App\Filament\Resources\NotificationRendezVouses\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Size;
+use Filament\Actions\ActionGroup;
+use Filament\Support\Icons\Heroicon;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\TextColumn;
 
 class NotificationRendezVousesTable
 {
@@ -64,7 +69,14 @@ class NotificationRendezVousesTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    DeleteAction::make(),
+                ])->label('More')
+                    ->icon(Heroicon::EllipsisVertical)
+                    ->size(Size::Small)
+                    ->color('primary')
+                    ->button(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

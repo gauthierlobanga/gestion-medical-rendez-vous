@@ -146,6 +146,7 @@ class RendezvousForm
                                     ->label('Date et heure')
                                     ->required()
                                     ->native(false)
+                                    ->closeOnDateSelection()
                                     ->minutesStep(15)
                                     ->displayFormat('Y-m-d H:i:s')
                                     ->minDate(now()),

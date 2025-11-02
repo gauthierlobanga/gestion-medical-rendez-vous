@@ -2,17 +2,22 @@
 
 namespace App\Filament\Resources\Medecins\Schemas;
 
+use App\Models\User;
+use App\Models\Medecin;
+use App\Models\Patient;
 use Filament\Schemas\Schema;
 use Filament\Resources\Pages\Page;
 use Spatie\Permission\Models\Role;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class MedecinForm
@@ -28,6 +33,60 @@ class MedecinForm
                                 Select::make('user_id')
                                     ->label('Utilisateur')
                                     ->relationship('user', 'name')
+                                    ->unique(
+                                        table: 'medecins',
+                                        column: 'user_id',
+                                        ignoreRecord: true
+                                    )
+                                    ->options(function (Get $get, ?Model $record): array {
+                                        // Si on édite un patient, on récupère son utilisateur actuel
+                                        $currentUser = null;
+                                        if ($record) {
+                                            $currentUser = User::find($record->user_id);
+                                        }
+
+                                        // Récupère les IDs des utilisateurs déjà assignés à un AUTRE patient
+                                        $assignedUserIds = Medecin::query()
+                                            ->when($record, fn($query) => $query->where('id', '!=', $record->id))
+                                            ->pluck('user_id');
+
+                                        // Récupère les utilisateurs éligibles (rôle patient, pas déjà assignés)
+                                        $eligibleUsers = User::role('medecin')
+                                            ->whereNotIn('id', $assignedUserIds)
+                                            ->limit(50)
+                                            ->pluck('name', 'id');
+
+                                        // Si on a un utilisateur actuel (en mode édition), on s'assure qu'il est dans la liste
+                                        if ($currentUser) {
+                                            $eligibleUsers[$currentUser->id] = $currentUser->name;
+                                        }
+
+                                        return $eligibleUsers->toArray();
+                                    })
+
+                                    // 3. Logique pour la recherche (maintenant cohérente avec le chargement)
+                                    ->getSearchResultsUsing(function (string $search, ?Model $record): array {
+                                        // Récupère les IDs des utilisateurs déjà assignés à un AUTRE patient
+                                        $assignedUserIds = Medecin::query()
+                                            ->when($record, fn($query) => $query->where('id', '!=', $record->id))
+                                            ->pluck('user_id');
+
+                                        // Requête sur les utilisateurs
+                                        $userQuery = User::role('medecin')
+                                            ->whereNotIn('id', $assignedUserIds)
+                                            ->where('name', 'like', "%{$search}%");
+
+                                        // On inclut aussi l'utilisateur actuel dans la recherche s'il correspond
+                                        if ($record && $record->user) {
+                                            $userQuery->orWhere('id', $record->user_id);
+                                        }
+
+                                        return $userQuery
+                                            ->limit(50)
+                                            ->pluck('name', 'id')
+                                            ->toArray();
+                                    })
+                                    ->getOptionLabelUsing(fn($value): ?string => User::find($value)?->name ?? '')
                                     ->required()
                                     ->searchable()
                                     ->preload()

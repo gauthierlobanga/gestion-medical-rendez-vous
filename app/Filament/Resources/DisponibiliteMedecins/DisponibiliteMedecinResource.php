@@ -9,6 +9,7 @@ use App\Filament\Resources\DisponibiliteMedecins\Schemas\DisponibiliteMedecinFor
 use App\Filament\Resources\DisponibiliteMedecins\Tables\DisponibiliteMedecinsTable;
 use App\Models\DisponibiliteMedecin;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,8 +19,9 @@ class DisponibiliteMedecinResource extends Resource
 {
     protected static ?string $model = DisponibiliteMedecin::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion Service';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+    protected static ?int $navigationSort = 5;
     protected static ?string $recordTitleAttribute = 'jour_semaine';
 
     public static function form(Schema $schema): Schema
@@ -46,5 +48,15 @@ class DisponibiliteMedecinResource extends Resource
             'create' => CreateDisponibiliteMedecin::route('/create'),
             'edit' => EditDisponibiliteMedecin::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'success' : 'danger';
     }
 }

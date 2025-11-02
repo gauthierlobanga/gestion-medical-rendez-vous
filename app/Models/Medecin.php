@@ -61,6 +61,19 @@ class Medecin extends Model
             ? $this->user->name . ' - ' . $this->specialite
             : null;
     }
+    public function getNomAttribute(): ?string
+    {
+        return $this->user
+            ? $this->user->name . ' - ' . $this->specialite
+            : '';
+    }
+
+    public function getEstResponsableAttribute(): bool
+    {
+        return $this->user
+            && $this->user->hasRole('Medecin Chef Service')
+            && !is_null($this->service_id);
+    }
 
     /**
      * Scope pour les médecins actifs

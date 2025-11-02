@@ -9,6 +9,7 @@ use App\Filament\Resources\Medecins\Schemas\MedecinForm;
 use App\Filament\Resources\Medecins\Tables\MedecinsTable;
 use App\Models\Medecin;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,8 +19,9 @@ class MedecinResource extends Resource
 {
     protected static ?string $model = Medecin::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion du personnel';
+    protected static ?int $navigationSort = 7;
     protected static ?string $recordTitleAttribute = 'numero_ordre';
 
     public static function form(Schema $schema): Schema
@@ -47,5 +49,15 @@ class MedecinResource extends Resource
             'create' => CreateMedecin::route('/create'),
             'edit' => EditMedecin::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'success' : 'danger';
     }
 }

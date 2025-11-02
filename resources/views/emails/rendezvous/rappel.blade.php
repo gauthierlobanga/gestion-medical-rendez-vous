@@ -2,7 +2,10 @@
 <html>
 
 <head>
-    <title>{{ $subject }}</title>
+    <title>
+        {{-- {{ $subject }} --}}
+        Rappel
+    </title>
     @include('partials.head-emails')
 </head>
 
@@ -10,7 +13,7 @@
     <div class="email-container">
         <!-- Header -->
         <div class="email-header bg-primary">
-            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>

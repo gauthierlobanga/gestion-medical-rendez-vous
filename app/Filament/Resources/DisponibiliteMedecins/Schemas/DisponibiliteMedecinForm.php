@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\DisponibiliteMedecins\Schemas;
 
+use Carbon\Carbon;
 use App\Models\Medecin;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Log;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
+use Filament\Support\Icons\Heroicon;
 
 class DisponibiliteMedecinForm
 {
@@ -35,6 +38,7 @@ class DisponibiliteMedecinForm
                                     ->preload(),
                                 Select::make('jour_semaine')
                                     ->label('Jour de la semaine')
+                                    ->native(false)
                                     ->options([
                                         1 => 'Lundi',
                                         2 => 'Mardi',
@@ -47,13 +51,34 @@ class DisponibiliteMedecinForm
                                     ->required(),
                                 TimePicker::make('heure_debut')
                                     ->label('Heure de début')
+                                    ->native(false)
+                                    ->seconds(false)
+                                    ->default('08:00')
                                     ->required()
-                                    ->seconds(false),
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set, $get) {
+                                        if (!$state) return;
+
+                                        try {
+                                            $heureDebut = Carbon::parse($state);
+                                            $nouvelleHeureFin = $heureDebut->copy()->addHours(8)->format('H:i');
+
+                                            // Toujours mettre à jour l'heure de fin
+                                            $set('heure_fin', $nouvelleHeureFin);
+                                        } catch (\Exception $e) {
+                                            // Fallback en cas d'erreur
+                                            $set('heure_fin', '16:00');
+                                        }
+                                    })
+                                    ->helperText('Heure à laquelle commence la disponibilité du médecin.'),
+
                                 TimePicker::make('heure_fin')
                                     ->label('Heure de fin')
+                                    ->native(false)
+                                    ->seconds(false)
+                                    ->default('16:00')
                                     ->required()
-                                    ->seconds(false),
-
+                                    ->helperText('Heure calculée automatiquement (+8h) mais modifiable.'),
                                 DatePicker::make('date_specifique')
                                     ->label('Date spécifique')
                                     ->native(false)
@@ -69,9 +94,23 @@ class DisponibiliteMedecinForm
                                 Toggle::make('est_exception')
                                     ->label('Exception')
                                     ->default(false)
+                                    ->onIcon(Heroicon::CheckBadge)
+                                    ->offIcon(Heroicon::NoSymbol)
+                                    ->onColor('success')
+                                    ->offColor('danger')
                                     ->reactive(),
                             ])->columns(2),
                     ])->columnSpanFull()
             ]);
+    }
+    protected function isHeureFinCalculee($heureDebut, $heureFin): bool
+    {
+        try {
+            $fin = Carbon::parse($heureFin);
+            $finCalculee = $heureDebut->copy()->addHours(8);
+            return $fin->format('H:i') === $finCalculee->format('H:i');
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

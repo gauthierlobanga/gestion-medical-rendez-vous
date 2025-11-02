@@ -4,7 +4,12 @@ namespace App\Filament\Resources\Services\Tables;
 
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Size;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Filters\Filter;
+use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
@@ -41,7 +46,15 @@ class ServicesTable
                     ->query(fn(Builder $query) => $query->where('is_active', true)),
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    ViewAction::make(),
+                ])->label('More')
+                    ->icon(Heroicon::EllipsisVertical)
+                    ->size(Size::Small)
+                    ->color('primary')
+                    ->button()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

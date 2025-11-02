@@ -9,6 +9,7 @@ use App\Filament\Resources\CreneauServices\Schemas\CreneauServiceForm;
 use App\Filament\Resources\CreneauServices\Tables\CreneauServicesTable;
 use App\Models\CreneauService;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,8 +19,9 @@ class CreneauServiceResource extends Resource
 {
     protected static ?string $model = CreneauService::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion Service';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Clock;
+    protected static ?int $navigationSort = 4;
     protected static ?string $recordTitleAttribute = 'jour_semaine';
 
     public static function form(Schema $schema): Schema
@@ -46,5 +48,15 @@ class CreneauServiceResource extends Resource
             'create' => CreateCreneauService::route('/create'),
             'edit' => EditCreneauService::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'success' : 'danger';
     }
 }

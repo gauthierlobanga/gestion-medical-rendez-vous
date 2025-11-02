@@ -5,10 +5,16 @@ namespace App\Filament\Resources\Rendezvouses\Tables;
 use App\Models\Medecin;
 use App\Models\Rendezvous;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Size;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Filters\Filter;
 use App\Mail\RendezVousConfirmeMail;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Mail;
 use Filament\Actions\BulkActionGroup;
 use App\Mail\AnnulationRendezVousMail;
@@ -36,6 +42,14 @@ class RendezvousesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('service.nom')
+                    ->formatStateUsing(fn($state): string => Str::limit($state, 20))
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+                        return $state;
+                    })
                     ->label('Service')
                     ->searchable()
                     ->sortable(),
@@ -44,9 +58,9 @@ class RendezvousesTable
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('duree')
-                    ->label('Durée (min)')
-                    ->sortable(),
+                // TextColumn::make('duree')
+                //     ->label('Durée (min)')
+                //     ->sortable(),
                 TextColumn::make('statut')
                     ->label('Statut')
                     ->badge()
@@ -112,6 +126,7 @@ class RendezvousesTable
             ->recordActions([
                 Action::make('confirmer')
                     ->label('Confirmer')
+                    ->button()
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->action(function (Rendezvous $record) {
@@ -123,6 +138,7 @@ class RendezvousesTable
                     ->visible(fn(Rendezvous $record): bool => $record->estPlanifie()),
                 Action::make('annuler')
                     ->label('Annuler')
+                    ->button()
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->schema([
@@ -138,7 +154,18 @@ class RendezvousesTable
                             ->send(new AnnulationRendezVousMail($record, 'patient', $data['raison']));
                     })
                     ->visible(fn(Rendezvous $record): bool => in_array($record->statut, ['planifie', 'confirme'])),
-                EditAction::make(),
+
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    ViewAction::make(),
+                ])->label('More')
+                    ->icon(Heroicon::EllipsisVertical)
+                    ->size(Size::Small)
+                    ->color('primary')
+                    ->button(),
+
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

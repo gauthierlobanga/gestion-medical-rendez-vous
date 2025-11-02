@@ -24,7 +24,7 @@ class CreneauxRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                TextInput::make('nom')
+                TextInput::make('jour_semaine')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -33,10 +33,34 @@ class CreneauxRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('nom')
+            ->recordTitleAttribute('jour_semaine')
             ->columns([
-                TextColumn::make('nom')
-                    ->searchable(),
+                TextColumn::make('service.nom')
+                    ->label('Service')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('jour_semaine')
+                    ->label('Jour')
+                    ->formatStateUsing(fn($state) => [
+                        1 => 'Lundi',
+                        2 => 'Mardi',
+                        3 => 'Mercredi',
+                        4 => 'Jeudi',
+                        5 => 'Vendredi',
+                        6 => 'Samedi',
+                        7 => 'Dimanche',
+                    ][$state] ?? 'Inconnu')
+                    ->sortable(),
+                TextColumn::make('heure_debut')
+                    ->label('Début')
+                    ->time('H:i'),
+                TextColumn::make('heure_fin')
+                    ->label('Fin')
+                    ->time('H:i'),
+                TextColumn::make('nombre_creneaux')
+                    ->label('Nombre'),
+                TextColumn::make('duree_creneau')
+                    ->label('Durée (min)'),
             ])
             ->filters([
                 //

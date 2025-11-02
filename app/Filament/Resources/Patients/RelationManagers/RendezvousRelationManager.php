@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Patients\RelationManagers;
 
+use App\Models\Medecin;
 use App\Models\Rendezvous;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -13,11 +14,13 @@ use Illuminate\Support\Facades\Mail;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -31,40 +34,86 @@ class RendezvousRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Select::make('medecin_id')
-                    ->label('Médecin')
-                    ->relationship('medecin', 'user.name')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-                Select::make('service_id')
-                    ->label('Service')
-                    ->relationship('service', 'nom')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-                DateTimePicker::make('date_heure')
-                    ->label('Date et heure')
-                    ->required()
-                    ->minutesStep(15)
-                    ->displayFormat('d/m/Y H:i')
-                    ->minDate(now()),
-                TextInput::make('duree')
-                    ->label('Durée (minutes)')
-                    ->numeric()
-                    ->default(30)
-                    ->minValue(5)
-                    ->maxValue(240),
-                Select::make('statut')
-                    ->label('Statut')
-                    ->options(Rendezvous::STATUTS)
-                    ->default('planifie')
-                    ->required(),
-                Textarea::make('motif')
-                    ->label('Motif de consultation')
-                    ->required()
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
+                Section::make('Informations du rendez-vous')
+                    ->schema([
+                        Select::make('medecin_id')
+                            ->label('Médecin')
+                            ->options(
+                                Medecin::with('user')
+                                    ->active()
+                                    ->get()
+                                    ->mapWithKeys(fn($medecin) => [
+                                        $medecin->id => $medecin->user->name . ' - ' . $medecin->specialite
+                                    ])
+                            )
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
+                        Select::make('service_id')
+                            ->label('Service')
+                            ->relationship('service', 'nom')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
+                        DateTimePicker::make('date_heure')
+                            ->label('Date et heure')
+                            ->required()
+                            ->native(false)
+                            ->minutesStep(15)
+                            ->displayFormat('Y-m-d H:i:s')
+                            ->minDate(now()),
+
+                        TextInput::make('duree')
+                            ->label('Durée (minutes)')
+                            ->numeric()
+                            ->default(30)
+                            ->minValue(5)
+                            ->maxValue(240),
+
+                        Select::make('statut')
+                            ->label('Statut')
+                            ->native(false)
+                            ->options(Rendezvous::STATUTS)
+                            ->default('planifie')
+                            ->required(),
+                    ]),
+                Section::make()
+                    ->schema([
+                        Select::make('type_consultation')
+                            ->label('Type de consultation')
+                            ->native(false)
+                            ->options(Rendezvous::TYPES_CONSULTATION)
+                            ->default('premiere')
+                            ->required(),
+
+                        TextInput::make('prix_consultation')
+                            ->label('Prix consultation')
+                            ->numeric()
+                            ->required()
+                            ->prefix('CDF'),
+
+                        Select::make('mode_paiement')
+                            ->label('Mode de paiement')
+                            ->native(false)
+                            ->options(Rendezvous::MODES_PAIEMENT)
+                            ->nullable(),
+                        Textarea::make('motif')
+                            ->label('Motif de consultation')
+                            ->required()
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+
+                        Textarea::make('notes')
+                            ->label('Notes')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+
+                        Toggle::make('est_paye')
+                            ->label('Payé')
+                            ->default(false),
+                    ])
             ]);
     }
 

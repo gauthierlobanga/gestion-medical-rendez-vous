@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Roles;
 
 use BackedEnum;
+use UnitEnum;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -18,8 +19,9 @@ class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|UnitEnum|null $navigationGroup = 'Security';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShieldCheck;
+    protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema

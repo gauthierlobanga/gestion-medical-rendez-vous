@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\DashboardDisponibilite;
+use App\Filament\Pages\DashboardMedecin;
+use App\Filament\Pages\DashboardNotification;
+use App\Filament\Pages\DashboardUser;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
@@ -45,13 +49,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
-                Dashboard::class,
+                DashboardUser::class,
+                DashboardMedecin::class,
+                DashboardNotification::class,
+                DashboardDisponibilite::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+            ->widgets([])
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Gestion des patients'),
@@ -60,7 +64,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Gestion des rendez-vous'),
                 NavigationGroup::make()
-                    ->label('Configuration'),
+                    ->label('Gestion Service'),
+                NavigationGroup::make()
+                    ->label('Security'),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -80,10 +86,11 @@ class AdminPanelProvider extends PanelProvider
                 EmailAuthentication::make(),
                 AppAuthentication::make()
                     ->recoverable()
-                    ->brandName('Filament Demo'),
+                    ->brandName('Filament RDV'),
             ])
             ->databaseNotifications()
             ->resourceCreatePageRedirect('index')
+            ->resourceEditPageRedirect('index')
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

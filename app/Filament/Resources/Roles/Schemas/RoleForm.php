@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Roles\Schemas;
 
+use Filament\Forms\Components\CheckboxList;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Tables\Columns\CheckboxColumn;
 
 class RoleForm
 {
@@ -12,14 +15,16 @@ class RoleForm
     {
         return $schema
             ->components([
-                TextInput::make('name')->required(),
-                Select::make('permissions')
-                    ->multiple()
-                    ->relationship('permissions', 'name')
-                    ->preload()
-                    ->reactive()
-                    ->live(onBlur: true)
-                    ->searchable(),
+                Section::make()
+                    ->schema([
+                        TextInput::make('name')->required(),
+                        CheckboxList::make('permissions')
+                            ->relationship('permissions', 'name')
+                            ->columns(4)
+                            ->bulkToggleable()
+                            ->noSearchResultsMessage('Aucun rôle trouvé')
+                            ->searchable(),
+                    ])->columnSpanFull()
             ]);
     }
 }

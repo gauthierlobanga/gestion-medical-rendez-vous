@@ -9,6 +9,7 @@ use App\Filament\Resources\Rendezvouses\Schemas\RendezvousForm;
 use App\Filament\Resources\Rendezvouses\Tables\RendezvousesTable;
 use App\Models\Rendezvous;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +19,10 @@ class RendezvousResource extends Resource
 {
     protected static ?string $model = Rendezvous::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion des rendez-vous';
+    protected static ?int $navigationSort = 9;
+    protected static ?string $navigationLabel = 'Rendez-vous';
 
     protected static ?string $recordTitleAttribute = 'specialite';
 
@@ -43,8 +47,19 @@ class RendezvousResource extends Resource
     {
         return [
             'index' => ListRendezvouses::route('/'),
-            'create' => CreateRendezvous::route('/create'),
+            // 'create' => CreateRendezvous::route('/create'),
             'edit' => EditRendezvous::route('/{record}/edit'),
         ];
+    }
+
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'success' : 'danger';
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Permissions;
 
 use BackedEnum;
+use UnitEnum;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -18,7 +19,9 @@ class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Security';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Key;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 

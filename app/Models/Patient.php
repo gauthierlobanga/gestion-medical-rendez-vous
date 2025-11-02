@@ -39,7 +39,6 @@ class Patient extends Model
             : null;
     }
 
-
     public function getFullNameAttribute(): ?string
     {
         return $this->user->name ?? null;

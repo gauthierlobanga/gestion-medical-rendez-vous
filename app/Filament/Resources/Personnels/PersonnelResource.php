@@ -9,6 +9,7 @@ use App\Filament\Resources\Personnels\Schemas\PersonnelForm;
 use App\Filament\Resources\Personnels\Tables\PersonnelsTable;
 use App\Models\Personnel;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -17,8 +18,9 @@ use Filament\Tables\Table;
 class PersonnelResource extends Resource
 {
     protected static ?string $model = Personnel::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion du personnel';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'poste';
 
@@ -46,5 +48,15 @@ class PersonnelResource extends Resource
             'create' => CreatePersonnel::route('/create'),
             'edit' => EditPersonnel::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::count() > 10 ? 'success' : 'danger';
     }
 }

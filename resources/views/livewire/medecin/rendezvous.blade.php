@@ -267,10 +267,19 @@ new class extends Component {
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <div
-                                                    class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                                    {{ substr($rdv->patient->full_name, 0, 1) }}
-                                                </div>
+                                                @if ($rdv->patient->user->avatar_url)
+                                                    <div
+                                                        class="flex-shrink-0 cursor-pointer h-5 w-10 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                        <img src="{{ $rdv->patient->user->avatar_url }}"
+                                                            class="cursor-pointer h-10 w-13 rounded-full object-cover" />
+                                                    </div>
+                                                    {{-- <flux:avatar circle size="lg"
+                                                        src="{{ $rdv->patient->user->avatar_url }}" /> --}}
+                                                @else
+                                                    <flux:avatar circle size="md"
+                                                        name="{{ $rdv->patient->user->initials() }}" />
+                                                @endif
+
                                                 <div class="ml-4">
                                                     <div
                                                         class="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -329,44 +338,32 @@ new class extends Component {
                                                 {{ $rdv->est_paye ? '✓ Payé' : '✗ En attente' }}
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
                                                 @if ($rdv->estPlanifie())
-                                                    <button wire:click="confirmer({{ $rdv->id }})"
+                                                    <flux:button variant="primary"
+                                                        wire:click="confirmer({{ $rdv->id }})"
                                                         wire:loading.attr="disabled"
-                                                        class="inline-flex items-center px-3 py-1.5 border border-green-300 dark:border-green-700 rounded-md text-sm font-medium text-green-700 dark:text-green-300 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors focus:outline-none">
-                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                                        class="inline-flex cursor-pointer items-center px-3 py-1.5 border border-green-300 dark:border-green-700 rounded-md text-sm font-medium text-green-700 dark:text-green-300 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors focus:outline-none">
                                                         Confirmer
-                                                    </button>
+                                                    </flux:button>
                                                 @endif
 
                                                 @if ($rdv->estPlanifie() || $rdv->estConfirme())
-                                                    <button wire:click="openAnnulerModal({{ $rdv->id }})"
-                                                        class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-700 rounded-md text-sm font-medium text-red-700 dark:text-red-300 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors focus:outline-none">
-                                                        <svg class="w-4 h-4 mr-1" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
+                                                    <flux:button variant="primary"
+                                                        wire:click="openAnnulerModal({{ $rdv->id }})"
+                                                        class="inline-flex cursor-pointer items-center px-3 py-1.5 border border-red-300 dark:border-red-700 rounded-md text-sm font-medium text-red-700 dark:text-red-300 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors focus:outline-none">
                                                         Annuler
-                                                    </button>
+                                                    </flux:button>
                                                 @endif
 
                                                 @if ($rdv->estConfirme())
-                                                    <button wire:click="terminer({{ $rdv->id }})"
+                                                    <flux:button variant="primary"
+                                                        wire:click="terminer({{ $rdv->id }})"
                                                         wire:loading.attr="disabled"
-                                                        class="inline-flex items-center px-3 py-1.5 border border-blue-300 dark:border-blue-700 rounded-md text-sm font-medium text-blue-700 dark:text-blue-300 bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors focus:outline-none">
-                                                        <svg class="w-4 h-4 mr-1" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                                        class="inline-flex cursor-pointer items-center px-3 py-1.5 border border-blue-300 dark:border-blue-700 rounded-md text-sm font-medium text-blue-700 dark:text-blue-300 bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors focus:outline-none">
                                                         Terminer
-                                                    </button>
+                                                    </flux:button>
                                                 @endif
                                             </div>
                                         </td>

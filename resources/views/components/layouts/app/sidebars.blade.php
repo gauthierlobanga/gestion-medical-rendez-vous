@@ -19,33 +19,35 @@
 
         <flux:input kbd="⌘K" icon="magnifying-glass" placeholder="Search..." />
 
-        <flux:sidebar.nav>
-            <flux:sidebar.item icon="users" :href="route('medecin.patients')"
-                :current="request()->routeIs('medecin.patients')" wire:navigate>
-                {{ __('Patients') }}
-            </flux:sidebar.item>
-            <flux:sidebar.item icon="calendar" :href="route('medecin.agenda')"
-                :current="request()->routeIs('medecin.agenda')" wire:navigate>
-                {{ __('Mon agenda') }}
-            </flux:sidebar.item>
-
-            <flux:sidebar.group expandable heading="Planification" class="grid">
-                <flux:sidebar.item icon="clipboard-document-check" :href="route('medecin.rendezvous')"
-                    :current="request()->routeIs('medecin.rendezvous')" wire:navigate>
-                    {{ __('Calandrier') }}
+        @if (auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('medecin'))
+            <flux:sidebar.nav>
+                <flux:sidebar.item icon="users" :href="route('medecin.patients')"
+                    :current="request()->routeIs('medecin.patients')" wire:navigate>
+                    {{ __('Patients') }}
+                </flux:sidebar.item>
+                <flux:sidebar.item icon="calendar" :href="route('medecin.agenda')"
+                    :current="request()->routeIs('medecin.agenda')" wire:navigate>
+                    {{ __('Mon agenda') }}
                 </flux:sidebar.item>
 
-                <flux:sidebar.item icon="calendar-days" :href="route('medecin.disponibilites')"
-                    :current="request()->routeIs('medecin.disponibilites')" wire:navigate>
-                    {{ __('Disponibilités') }}
-                </flux:sidebar.item>
-                <flux:sidebar.item icon="rectangle-stack" :href="route('medecin.service')"
-                    :current="request()->routeIs('medecin.service')" wire:navigate>
-                    {{ __('Service') }}
-                </flux:sidebar.item>
+                <flux:sidebar.group expandable heading="Planification" class="grid">
+                    <flux:sidebar.item icon="clipboard-document-check" :href="route('medecin.rendezvous')"
+                        :current="request()->routeIs('medecin.rendezvous')" wire:navigate>
+                        {{ __('Calandrier') }}
+                    </flux:sidebar.item>
 
-            </flux:sidebar.group>
-        </flux:sidebar.nav>
+                    <flux:sidebar.item icon="calendar-days" :href="route('medecin.disponibilites')"
+                        :current="request()->routeIs('medecin.disponibilites')" wire:navigate>
+                        {{ __('Disponibilités') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="rectangle-stack" :href="route('medecin.service')"
+                        :current="request()->routeIs('medecin.service')" wire:navigate>
+                        {{ __('Service') }}
+                    </flux:sidebar.item>
+
+                </flux:sidebar.group>
+            </flux:sidebar.nav>
+        @endif
 
         <flux:sidebar.spacer />
 
@@ -70,52 +72,6 @@
             </flux:sidebar.item>
         </flux:sidebar.nav>
 
-        @auth
-            <flux:dropdown position="top" align="end" class="bg-zinc-50 dark:bg-zinc-900">
-                <flux:profile icon:trailing="chevron-up-down" circle name="{{ auth()->user()->name }}"
-                    avatar="{{ auth()->user()->avatar_url ?? auth()->user()->initials() }}" class="cursor-pointer"
-                    :initials="auth()->user()->initials()" />
-                <flux:menu class="bg-zinc-50 dark:bg-zinc-900">
-                    <flux:menu.radio.group>
-                        <div class="p-0 text-sm font-normal">
-                            <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                        <flux:avatar circle badge badge:color="green" badge:circle
-                                            src="{{ auth()->user()->avatar_url ?? auth()->user()->initials() }}" />
-                                    </span>
-                                </span>
-
-                                <div class="grid flex-1 text-left text-sm leading-tight">
-                                    <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <flux:menu.radio.group>
-                        @if (auth()->user()->hasRole('Super Admin'))
-                            <flux:menu.item :href="route('filament.admin.home')" icon="chart-bar" target="_blank">
-                                {{ __('admin panel') }}
-                            </flux:menu.item>
-                        @endif
-                    </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                            {{ __('Se déconnecter') }}
-                        </flux:menu.item>
-                    </form>
-                </flux:menu>
-            </flux:dropdown>
-        @endauth
     </flux:sidebar>
 
     <flux:header container class="border-b border-zinc-100 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -177,25 +133,7 @@
                         <flux:text size="sm">Se connecter en tant que</flux:text>
                         <flux:heading class="mt-1! truncate">{{ auth()->user()->email }}</flux:heading>
                     </div>
-
                     <flux:navmenu.separator />
-
-                    <div class="px-2 py-1.5">
-                        <flux:text size="sm" class="pl-7">Teams</flux:text>
-                    </div>
-
-                    <flux:navmenu.item href="#" icon="check" class="text-zinc-800 dark:text-white truncate">
-                        Personal
-                    </flux:navmenu.item>
-                    <flux:navmenu.item href="#" indent class="text-zinc-800 dark:text-white truncate">
-                        Wireable LLC
-                    </flux:navmenu.item>
-
-                    <flux:navmenu.separator />
-
-                    <flux:navmenu.item href="/dashboard" icon="key" class="text-zinc-800 dark:text-white">
-                        Licenses
-                    </flux:navmenu.item>
                     <flux:navmenu.item :href="route('settings.profile')" icon="user"
                         class="text-zinc-800 dark:text-white">
                         Compte
@@ -211,10 +149,6 @@
 
                     <flux:navmenu.separator />
 
-                    {{-- <flux:navmenu.item href="/logout" icon="arrow-right-start-on-rectangle"
-                        class="text-zinc-800 dark:text-white">
-                        Logout
-                    </flux:navmenu.item> --}}
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:navmenu.item class="cursor-pointer" as="button" type="submit"

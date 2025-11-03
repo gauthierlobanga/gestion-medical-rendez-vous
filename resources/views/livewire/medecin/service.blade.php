@@ -70,12 +70,8 @@ new class extends Component {
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Responsable</label>
                                 <p class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    {{ $service->responsable->full_name }}
+                                    <flux:avatar size="xl" src="{{ $service->responsable->user->avatar_url }}"
+                                        name="{{ $service->responsable->user->initials() }}" />
                                 </p>
                             </div>
                         @endif
@@ -229,7 +225,9 @@ new class extends Component {
                                     </div>
                                     <div
                                         class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                                        {{ substr($collegue->full_name, 0, 1) }}
+                                        {{-- {{ substr($collegue->full_name, 0, 1) }} --}}
+                                        <flux:avatar size="lg" src="{{ $collegue->user->avatar_url }}"
+                                            name="{{ $collegue->user->initials() }}" />
                                     </div>
                                 </div>
                             </div>

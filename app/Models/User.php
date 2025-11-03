@@ -28,6 +28,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasAvatar,
         HasRoles,
         SoftDeletes,
         InteractsWithMedia;
+    protected $guard_name = 'web';
 
 
     /**

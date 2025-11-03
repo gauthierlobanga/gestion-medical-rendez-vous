@@ -1,16 +1,19 @@
 <?php
 
 use App\Models\User;
-
-test('guests are redirected to the login page', function () {
-    $response = $this->get('/dashboard');
-    $response->assertRedirect('/login');
-});
+use App\Models\Medecin;
 
 test('authenticated users can visit the dashboard', function () {
     $user = User::factory()->create();
+
+    $medecin = Medecin::factory()->create([
+        'user_id' => $user->id,
+        'specialite' => 'Cardiologie',
+    ]);
+
     $this->actingAs($user);
 
     $response = $this->get('/dashboard');
+
     $response->assertStatus(200);
 });

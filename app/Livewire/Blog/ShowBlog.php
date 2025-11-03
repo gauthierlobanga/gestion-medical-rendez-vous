@@ -2,18 +2,19 @@
 
 namespace App\Livewire\Blog;
 
-use Livewire\Component;
 use App\Models\Post;
+use Livewire\Component;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
 
-// #[Title('N-xotech | Blog')]
+#[Layout('layouts.main')]
 class ShowBlog extends Component
 {
     public Post $post;
 
     public function mount(Post $post)
     {
-        $this->post = $post->load(['category', 'user', 'tags','media','comments']);
+        $this->post = $post->load(['category', 'user', 'tags', 'media', 'comments']);
     }
 
     public function render()
@@ -28,6 +29,6 @@ class ShowBlog extends Component
                 ->latest()
                 ->get()
         ])
-        ->title($this->post->title .' | Nxotech');
+            ->title($this->post->title . ' | Nxotech');
     }
 }
